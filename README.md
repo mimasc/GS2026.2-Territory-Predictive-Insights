@@ -71,4 +71,5 @@ a partir do enunciado, e depois foi executado (`mvn test` e rodando o menu com d
 *Complete aqui, como equipe: o que cada integrante revisou e entendeu, e o que foi alterado por vocês.*
 
 ## Divisão de tarefas
-*Preencher com os 3 integrantes (domínio/exceções · persistência · previsões/alertas/testes).*
+Equipe de 2 integrantes: **Mirella Mascarenhas** (`mimasc`) e **André Nóbrega** (`AndreNobrega125`).
+*Preencher quem ficou com cada frente: domínio/exceções · persistência · previsões/alertas/testes.*
