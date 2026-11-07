@@ -17,6 +17,10 @@ Requisitos: **Java 21** e **Maven 3.9+** (com `JAVA_HOME` apontando para o Java 
 mvn test                      # 20 testes unitários
 mvn -q compile exec:java      # abre o menu no console
 ```
+> **Atenção ao Java:** o projeto exige o **Java 21**. Se o Maven usar outra versão (ex.: Java 27, comum após
+> `brew install maven`), os testes com Mockito falham. Confira com `mvn -v` e, se preciso, rode antes:
+> macOS: `export JAVA_HOME=$(/usr/libexec/java_home -v 21)` · Windows: `set JAVA_HOME=C:\caminho\do\jdk-21`.
+
 O banco é **H2 em arquivo** (`./data/territorio`), criado automaticamente; o histórico sobrevive ao reiniciar.
 Para zerar o histórico, apague a pasta `data/`.
 
