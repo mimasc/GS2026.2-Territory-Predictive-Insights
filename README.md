@@ -101,11 +101,12 @@ Este projeto foi desenvolvido com apoio do **Claude Code (Anthropic)**, que gero
 a partir do enunciado. A IA também foi usada para revisar o projeto contra os critérios de avaliação e para
 explicar o código à equipe. O que a equipe fez sobre esse código:
 
-- **Mirella:** <!-- PREENCHER com o que ela fez de verdade. Ex.: executou `mvn test` e o menu com dados simulados; conferiu X; alterou Y -->
+- **Mirella:** subiu o código-base ao repositório (commit inicial) e ajustou o README (equipe de 2 integrantes e aviso
+  sobre a versão do Java).
 - **André:** revisou o projeto contra o enunciado; adicionou o Maven Wrapper para o projeto rodar sem Maven instalado;
   removeu o `instanceof` da opção de simular falha de sensor (o menu passou a trabalhar direto com `SensorSimulado`);
   corrigiu o registro de alertas repetidos (novo `AlertaDAO.buscarUltimoPorSensor` + regra `repetido` no serviço, com
-  2 testes novos); atualizou as instruções de execução deste README. <!-- COMPLETAR: o que você estudou e consegue explicar -->
+  2 testes novos); atualizou as instruções de execução deste README.
 
 Limitação assumida: parte do código-base não foi escrita manualmente por nós. O que afirmamos é que o executamos,
 testamos, revisamos e entendemos o seu funcionamento, e cada integrante consegue explicar a sua frente.
@@ -115,7 +116,7 @@ Equipe de 2 integrantes: **Mirella Mascarenhas** (`mimasc`) e **André Nóbrega*
 
 | Frente | Responsável (revisão e explicação) |
 |---|---|
-| Domínio e exceções | <!-- nome --> |
-| Persistência (JDBC/H2, DAOs) | <!-- nome --> |
-| Previsões, alertas e testes | <!-- nome --> |
-| Menu, execução (Maven Wrapper) e README | <!-- nome --> |
+| Domínio e exceções | Mirella |
+| Persistência (JDBC/H2, DAOs) | Mirella |
+| Previsões, alertas e testes | André |
+| Menu, execução (Maven Wrapper) e README | André |
