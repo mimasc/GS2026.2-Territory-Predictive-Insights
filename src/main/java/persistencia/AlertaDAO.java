@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AlertaDAO {
     private final Conexao conexao;
@@ -47,15 +48,7 @@ public class AlertaDAO {
             ps.setInt(1, limite);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    resultado.add(new Alerta(
-                            rs.getString("sensor_id"),
-                            TipoSensor.valueOf(rs.getString("tipo")),
-                            NivelAlerta.valueOf(rs.getString("nivel")),
-                            rs.getDouble("valor_previsto"),
-                            rs.getDouble("limite"),
-                            rs.getString("estrategia"),
-                            rs.getString("explicacao"),
-                            rs.getTimestamp("data_hora").toLocalDateTime()));
+                    resultado.add(mapear(rs));
                 }
             }
         } catch (SQLException e) {
@@ -64,5 +57,33 @@ public class AlertaDAO {
             throw new FonteIndisponivelException("Registro de alerta inconsistente no banco: " + e.getMessage(), e);
         }
         return resultado;
+    }
+
+    /** Último alerta emitido para o sensor, se existir. Usado para não gravar o mesmo alerta duas vezes. */
+    public Optional<Alerta> buscarUltimoPorSensor(String sensorId) throws FonteIndisponivelException {
+        String sql = "SELECT sensor_id, tipo, nivel, valor_previsto, limite, estrategia, explicacao, data_hora "
+                + "FROM alerta WHERE sensor_id = ? ORDER BY id DESC LIMIT 1";
+        try (Connection conn = conexao.abrir(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, sensorId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(mapear(rs)) : Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new FonteIndisponivelException("Falha ao consultar o último alerta no banco: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw new FonteIndisponivelException("Registro de alerta inconsistente no banco: " + e.getMessage(), e);
+        }
+    }
+
+    private Alerta mapear(ResultSet rs) throws SQLException {
+        return new Alerta(
+                rs.getString("sensor_id"),
+                TipoSensor.valueOf(rs.getString("tipo")),
+                NivelAlerta.valueOf(rs.getString("nivel")),
+                rs.getDouble("valor_previsto"),
+                rs.getDouble("limite"),
+                rs.getString("estrategia"),
+                rs.getString("explicacao"),
+                rs.getTimestamp("data_hora").toLocalDateTime());
     }
 }

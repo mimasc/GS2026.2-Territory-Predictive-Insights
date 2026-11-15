@@ -201,7 +201,7 @@ public class SistemaMonitoramento {
         }
     }
 
-    private Sensor escolherSensor() {
+    private SensorSimulado escolherSensor() {
         for (int i = 0; i < sensores.size(); i++) {
             Sensor s = sensores.get(i);
             System.out.println("  " + (i + 1) + " - " + s.getId() + " (" + s.getTipo().getDescricao() + ")");
@@ -282,10 +282,10 @@ public class SistemaMonitoramento {
     }
 
     private void alternarSensor() {
-        Sensor s = escolherSensor();
-        if (s instanceof SensorSimulado simulado) {
-            simulado.setFuncionando(!simulado.estaFuncionando());
-            System.out.println(s.getId() + (simulado.estaFuncionando() ? " religado." : " desligado (falha simulada)."));
+        SensorSimulado s = escolherSensor();
+        if (s != null) {
+            s.setFuncionando(!s.estaFuncionando());
+            System.out.println(s.getId() + (s.estaFuncionando() ? " religado." : " desligado (falha simulada)."));
         }
     }
 

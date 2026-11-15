@@ -13,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import persistencia.AlertaDAO;
 import persistencia.MedicaoDAO;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -89,5 +91,38 @@ class ServicoMonitoramentoTest {
 
         assertEquals(12.0, m.getValor());
         verify(medicaoDAO).salvar(m);
+    }
+
+    @Test
+    void alertaIdenticoSemLeituraNovaNaoEhGravadoDeNovo() throws Exception {
+        // Arrange: previsão = 60 mm/h (CRÍTICO) e o último alerta do sensor é igual e posterior às leituras
+        when(medicaoDAO.buscarPorSensor(eq("PLUV-01"), anyInt())).thenReturn(historicoDeChuva(5, 10, 20, 55, 60, 65));
+        Alerta ultimo = new Alerta("PLUV-01", TipoSensor.CHUVA, NivelAlerta.CRITICO, 60.0, 50.0,
+                "Média móvel", "alerta anterior", LocalDateTime.now().plusMinutes(1));
+        when(alertaDAO.buscarUltimoPorSensor("PLUV-01")).thenReturn(Optional.of(ultimo));
+
+        // Act
+        ResultadoPrevisao r = servico.avaliarSensor(pluviometro, new PrevisaoMediaMovel(3));
+
+        // Assert: o resultado ainda informa o alerta, mas ele não é gravado duas vezes
+        assertEquals(NivelAlerta.CRITICO, r.nivel());
+        assertTrue(r.interpretacao().contains("não foi gravado de novo"));
+        verify(alertaDAO, never()).salvar(any());
+    }
+
+    @Test
+    void leituraNovaDepoisDoUltimoAlertaGravaAlertaDeNovo() throws Exception {
+        // Arrange: o último alerta é anterior às leituras atuais, então há dado novo desde então
+        when(medicaoDAO.buscarPorSensor(eq("PLUV-01"), anyInt())).thenReturn(historicoDeChuva(5, 10, 20, 55, 60, 65));
+        Alerta antigo = new Alerta("PLUV-01", TipoSensor.CHUVA, NivelAlerta.CRITICO, 60.0, 50.0,
+                "Média móvel", "alerta anterior", LocalDateTime.now().minusMinutes(5));
+        when(alertaDAO.buscarUltimoPorSensor("PLUV-01")).thenReturn(Optional.of(antigo));
+
+        // Act
+        ResultadoPrevisao r = servico.avaliarSensor(pluviometro, new PrevisaoMediaMovel(3));
+
+        // Assert
+        assertFalse(r.interpretacao().contains("não foi gravado de novo"));
+        verify(alertaDAO).salvar(any(Alerta.class));
     }
 }

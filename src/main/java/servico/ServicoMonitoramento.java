@@ -41,7 +41,8 @@ public class ServicoMonitoramento {
     /** Prevê o próximo valor do sensor com base no histórico do banco e emite alerta se passar de um limiar. */
     public ResultadoPrevisao avaliarSensor(Sensor sensor, EstrategiaPrevisao estrategia)
             throws DadosInvalidosException, FonteIndisponivelException {
-        List<Double> valores = medicaoDAO.buscarPorSensor(sensor.getId(), LIMITE_HISTORICO).stream()
+        List<Medicao> medicoes = medicaoDAO.buscarPorSensor(sensor.getId(), LIMITE_HISTORICO);
+        List<Double> valores = medicoes.stream()
                 .map(Medicao::getValor)
                 .toList();
         TipoSensor tipo = sensor.getTipo();
@@ -60,8 +61,30 @@ public class ServicoMonitoramento {
         String explicacao = montarExplicacao(sensor, estrategia, previsto, nivel, limite);
         Alerta alerta = new Alerta(sensor.getId(), tipo, nivel, previsto, limite, estrategia.getNome(),
                 explicacao, LocalDateTime.now());
-        alertaDAO.salvar(alerta);
-        return new ResultadoPrevisao(sensor.getId(), tipo, previsto, estrategia.getNome(), nivel, explicacao, alerta);
+        String interpretacao = explicacao;
+        if (repetido(alerta, medicoes)) {
+            interpretacao += " [Alerta idêntico ao último já registrado e sem leitura nova desde então: não foi gravado de novo.]";
+        } else {
+            alertaDAO.salvar(alerta);
+        }
+        return new ResultadoPrevisao(sensor.getId(), tipo, previsto, estrategia.getNome(), nivel, interpretacao, alerta);
+    }
+
+    /**
+     * Um alerta é repetido quando é igual ao último do sensor (nível, estratégia e valor previsto) e nenhuma
+     * leitura nova chegou depois dele. Leitura nova, outra estratégia ou outra janela geram alerta novo.
+     */
+    private boolean repetido(Alerta novo, List<Medicao> medicoes) throws FonteIndisponivelException {
+        if (medicoes.isEmpty()) {
+            return false;
+        }
+        LocalDateTime ultimaLeitura = medicoes.get(medicoes.size() - 1).getDataHora();
+        return alertaDAO.buscarUltimoPorSensor(novo.getSensorId())
+                .filter(ultimo -> ultimo.getNivel() == novo.getNivel()
+                        && ultimo.getEstrategia().equals(novo.getEstrategia())
+                        && Double.compare(ultimo.getValorPrevisto(), novo.getValorPrevisto()) == 0
+                        && !ultimo.getDataHora().isBefore(ultimaLeitura))
+                .isPresent();
     }
 
     private String montarExplicacao(Sensor sensor, EstrategiaPrevisao estrategia, double previsto,
