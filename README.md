@@ -101,9 +101,11 @@ Este projeto foi desenvolvido com apoio do **Claude Code (Anthropic)**, que gero
 a partir do enunciado. A IA também foi usada para revisar o projeto contra os critérios de avaliação e para
 explicar o código à equipe. O que a equipe fez sobre esse código:
 
-- **Mirella:** subiu o código-base ao repositório (commit inicial) e ajustou o README (equipe de 2 integrantes e aviso
-  sobre a versão do Java).
-- **André:** revisou o projeto contra o enunciado; adicionou o Maven Wrapper para o projeto rodar sem Maven instalado;
+- **Mirella:** conduziu a maior parte do projeto. Criou o repositório, desenvolveu o código-base com o Claude Code a
+  partir do enunciado (domínio, exceções, persistência JDBC/H2, previsões, alertas, menu e testes) e o subiu ao
+  repositório. Escreveu o README original (recorte, público beneficiado, padrões criacionais, decisões da equipe e
+  reflexão crítica) e ajustou a equipe e o aviso sobre a versão do Java.
+- **André:** contribuições complementares sobre o projeto já construído: revisou o projeto contra o enunciado; adicionou o Maven Wrapper para o projeto rodar sem Maven instalado;
   removeu o `instanceof` da opção de simular falha de sensor (o menu passou a trabalhar direto com `SensorSimulado`);
   corrigiu o registro de alertas repetidos (novo `AlertaDAO.buscarUltimoPorSensor` + regra `repetido` no serviço, com
   2 testes novos); atualizou as instruções de execução deste README.
@@ -118,5 +120,6 @@ Equipe de 2 integrantes: **Mirella Mascarenhas** (`mimasc`) e **André Nóbrega*
 |---|---|
 | Domínio e exceções | Mirella |
 | Persistência (JDBC/H2, DAOs) | Mirella |
-| Previsões, alertas e testes | André |
-| Menu, execução (Maven Wrapper) e README | André |
+| Previsões, alertas e testes | Mirella (base); André (regra de alerta repetido e 2 testes novos) |
+| Menu, README e demonstração | Mirella |
+| Execução (Maven Wrapper) | André |
